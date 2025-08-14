@@ -1,33 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    app:divider="@drawable/shape_line"
+    app:showDividers="middle"
+    >
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:orientation="vertical">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <com.superman.drilldemo.HalfCircleProgressBar3
+            android:id="@+id/half_circle_progress_bar3"
+            android:layout_width="200dp"
+            android:layout_gravity="center_horizontal"
+            android:paddingHorizontal="20dp"
+            android:layout_height="wrap_content"
+            app:hcp_progressColor="@color/design_default_color_primary"
+            app:hcp_trackColor="@color/material_dynamic_neutral60"
+            app:hcp_progressWidth="16dp"
+            app:hcp_maxProgress="100"
+            app:hcp_progress="30"
+            app:hcp_thumbColor="@color/design_default_color_primary_dark"
+            app:hcp_thumbRadius="12dp"
+            app:hcp_touchEnabled="true"
+            app:hcp_startAngle="180"
+            app:hcp_sweepAngle="180" />
+
+        <com.superman.drilldemo.HalfCircleProgressBar2
+            android:id="@+id/half_circle_progress_bar2"
+            android:layout_width="200dp"
+            android:layout_gravity="center_horizontal"
+            android:paddingHorizontal="20dp"
+            android:layout_height="wrap_content"
+            app:hcp_progressColor="@color/design_default_color_primary"
+            app:hcp_trackColor="@color/material_dynamic_neutral60"
+            app:hcp_progressWidth="16dp"
+            app:hcp_maxProgress="100"
+            app:hcp_progress="30"
+            app:hcp_thumbColor="@color/design_default_color_primary_dark"
+            app:hcp_thumbRadius="12dp"
+            app:hcp_touchEnabled="true"
+            app:hcp_startAngle="180"
+        app:hcp_sweepAngle="180" />
+
+<!--        <com.example.customview.HalfCircleProgressBar-->
+<!--            android:id="@+id/half_circle_progress_bar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:hcp_maxProgress="100"-->
+<!--            app:hcp_progress="25"-->
+<!--            app:hcp_progressColor="@color/color1"-->
+<!--            app:hcp_progressWidth="12dp"-->
+<!--            app:hcp_startAngle="135"-->
+<!--            app:hcp_sweepAngle="270"-->
+<!--            app:hcp_thumbColor="@color/color2"-->
+<!--            app:hcp_thumbRadius="15dp"-->
+<!--            app:hcp_touchEnabled="true"-->
+<!--            app:hcp_trackColor="@color/color3" />-->
+
+<!--        <com.superman.exoplayerdemo.HalfProgressBar-->
+<!--            android:layout_width="200dp"-->
+<!--            android:layout_height="200dp"-->
+<!--            android:layout_gravity="center_horizontal" />-->
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/play"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Play"
+            android:textAllCaps="false" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/pause"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Pause"
+            android:textAllCaps="false" />
 
-    <include layout="@layout/content_main" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Next"
+            android:textAllCaps="false" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/previous"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Previous"
+            android:textAllCaps="false" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvListState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/playerView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="20dp"
+            android:keepScreenOn="true" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/firstAct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FirstActivity"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HalfCircleProgressBar">
+        <attr name="hcp_progressColor" format="color" />
+        <attr name="hcp_trackColor" format="color" />
+        <attr name="hcp_progressWidth" format="dimension" />
+        <attr name="hcp_maxProgress" format="integer" />
+        <attr name="hcp_progress" format="integer" />
+        <attr name="hcp_thumbColor" format="color" />
+        <attr name="hcp_thumbRadius" format="dimension" />
+        <!-- startAngle 和 sweepAngle 将在代码中固定或作为可选的微调 -->
+        <attr name="hcp_startAngle" format="float" />
+        <attr name="hcp_sweepAngle" format="float" />
+        <attr name="hcp_touchEnabled" format="boolean" />
+    </declare-styleable>
+</resources>
