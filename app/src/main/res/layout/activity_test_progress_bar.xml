@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Custom Progress Bar with Drawable Thumb"
+        android:layout_marginBottom="16dp"
+        android:textSize="18sp"/>
+
+    <com.superman.drilldemo.wiget.CustomProgressBar
+        android:id="@+id/myCustomProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cpb_isUserSeekable="true"
+
+        app:cpb_progressColor="#FF4081"
+        app:cpb_trackColor="#D1C4E9"
+        app:cpb_progressBarHeight="8dp"
+        app:cpb_max="100"
+        app:cpb_progress="25"
+        app:cpb_cornerRadius="4dp"
+        app:cpb_thumbDrawable="@drawable/ic_default_thumb"
+        app:cpb_thumbWidth="32dp"
+        app:cpb_thumbHeight="32dp"
+
+        app:cpb_isThumbDraggable="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnIncreaseProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Increase Progress"/>
+
+    <Button
+        android:id="@+id/btnDecreaseProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decrease Progress"/>
+
+
+    <com.warkiz.widget.IndicatorSeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:isb_progress="76.9"
+        app:isb_progress_value_float="true"
+        app:isb_show_indicator="none"
+        app:isb_show_thumb_text="false" />
+</LinearLayout>

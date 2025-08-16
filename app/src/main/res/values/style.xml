@@ -13,4 +13,22 @@
         <attr name="hcp_sweepAngle" format="float" />
         <attr name="hcp_touchEnabled" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="CustomProgressBar">
+        <attr name="cpb_progressColor" format="color" />
+        <attr name="cpb_trackColor" format="color" />
+        <attr name="cpb_progressBarHeight" format="dimension" />
+        <attr name="cpb_max" format="integer" />
+        <attr name="cpb_progress" format="integer" />
+        <attr name="cpb_cornerRadius" format="dimension" />
+
+        <attr name="cpb_thumbDrawable" format="reference" />
+        <attr name="cpb_thumbWidth" format="dimension" />
+        <attr name="cpb_thumbHeight" format="dimension" />
+        <attr name="cpb_thumbTint" format="color" />
+
+        <attr name="cpb_isUserSeekable" format="boolean" />
+        <attr name="cpb_isThumbDraggable" format="boolean" />
+    </declare-styleable>
+
 </resources>

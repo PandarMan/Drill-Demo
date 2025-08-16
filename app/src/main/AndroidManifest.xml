@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DrillDemo">
         <activity
-            android:name=".MainActivity"
+            android:name=".DemoActivity"
             android:exported="true"
             android:theme="@style/Theme.DrillDemo">
             <intent-filter>
@@ -21,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name="com.superman.exoplayerdemo.FirstActivity"/>
+        <activity android:name=".activity.TestProgressBarActivity"/>
     </application>
 
 </manifest>

@@ -54,4 +54,8 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.session)
+//    implementation(libs.tablayout)
+//    implementation(libs.viewpager2delegate)
+
+    implementation(libs.indicatorseekbar)
 }
