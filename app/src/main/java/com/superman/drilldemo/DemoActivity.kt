@@ -20,5 +20,8 @@ class DemoActivity:AppCompatActivity() {
         vb.btnCustomProgressBar.setOnClickListener {
             startActivity(Intent(this, TestProgressBarActivity::class.java))
         }
+        vb.btnSongAct.setOnClickListener {
+            startActivity(Intent(this, SongMainActivity::class.java))
+        }
     }
 }
