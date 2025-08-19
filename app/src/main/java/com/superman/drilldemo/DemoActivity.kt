@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.superman.drilldemo.activity.TestProgressBarActivity
 import com.superman.drilldemo.databinding.ActivityDemoBinding
+import com.superman.drilldemo.play.SongMainActivity
+import com.superman.drilldemo.play.SongMainActivity22
 
 /**
  *
@@ -22,6 +24,9 @@ class DemoActivity:AppCompatActivity() {
         }
         vb.btnSongAct.setOnClickListener {
             startActivity(Intent(this, SongMainActivity::class.java))
+        }
+        vb.btnSongAct2.setOnClickListener {
+            startActivity(Intent(this, SongMainActivity22::class.java))
         }
     }
 }

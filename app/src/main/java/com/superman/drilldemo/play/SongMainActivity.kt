@@ -1,12 +1,10 @@
-package com.superman.drilldemo // Asegúrate de que el nombre del paquete sea el correcto
+package com.superman.drilldemo.play // Asegúrate de que el nombre del paquete sea el correcto
 
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
 import android.widget.SeekBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -20,7 +18,6 @@ import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.superman.drilldemo.databinding.SongActivityMainBinding
-import com.superman.drilldemo.play.PlaySongService
 import java.util.concurrent.TimeUnit
 // import com.superman.drilldemo.R // Importa tu archivo R si es necesario para los IDs de layout
 

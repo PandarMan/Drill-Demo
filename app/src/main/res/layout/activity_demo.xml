@@ -25,5 +25,11 @@
             android:layout_height="wrap_content"
             android:text="Song playService" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSongAct2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Song playService2" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.core.widget.NestedScrollView>

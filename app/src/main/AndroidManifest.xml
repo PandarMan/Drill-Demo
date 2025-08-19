@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,25 +26,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".play.SongMainActivity22" />
         <activity android:name=".MainActivity" />
-        <activity android:name="com.superman.exoplayerdemo.FirstActivity"/>
-        <activity android:name=".activity.TestProgressBarActivity"/>
-        <activity android:name=".SongMainActivity"/>
+        <activity android:name="com.superman.exoplayerdemo.FirstActivity" />
+        <activity android:name=".activity.TestProgressBarActivity" />
+        <activity android:name=".play.SongMainActivity" />
+
         <service
             android:name="com.superman.exoplayerdemo.PlaybackService"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="true">
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
             <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService"/>
+                <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
         <service
             android:name=".play.PlaySongService"
-            android:foregroundServiceType="mediaPlayback"
+            android:exported="true"
 
-            android:exported="true">
+            android:foregroundServiceType="mediaPlayback">
             <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService"/>
+                <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
 
