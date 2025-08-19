@@ -127,7 +127,8 @@ class PlaySongService : MediaSessionService() {
         mediaSession = MediaSession.Builder(this, player)
             .setSessionActivity(sessionActivityPendingIntent ?: createDefaultOpenAppPendingIntent())
             .setCallback(CustomMediaSessionCallback())
-            // .setBitmapLoader(...) // 推荐添加 BitmapLoader 用于专辑封面
+//             .setBitmapLoader(...) // 推荐添加 BitmapLoader 用于专辑封面
+            .setBitmapLoader(GlideBitmapLoader(this))
             .build()
 
         setMediaNotificationProvider(CustomNotificationProvider1(this))

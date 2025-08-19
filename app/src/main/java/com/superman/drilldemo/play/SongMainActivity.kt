@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.Log
@@ -58,6 +59,7 @@ class SongMainActivity : AppCompatActivity() {
                                 androidx.media3.common.MediaMetadata.Builder()
                                     .setTitle("SoundHelix Song 1")
                                     .setArtist("SoundHelix")
+                                    .setArtworkUri("https://upload-images.jianshu.io/upload_images/5809200-a99419bb94924e6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240".toUri())
                                     // .setAlbumArtUri(...) // Podrías añadir URI de artwork aquí
                                     .build()
                             )

@@ -1,10 +1,12 @@
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.RemoteViews
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
@@ -39,6 +41,17 @@ class CustomNotificationProvider1(private val context: Context) : MediaNotificat
         val smallContentView = RemoteViews(context.packageName, R.layout.custom_notification_layout)
         smallContentView.setTextViewText(R.id.notification_title, metadata.title ?: "未知标题")
         smallContentView.setTextViewText(R.id.notification_artist, metadata.artist ?: "未知艺术家")
+//        if (metadata.artworkData != null) {
+//            try {
+//                coverBitmap = BitmapFactory.decodeByteArray(metadata.artworkData, 0, metadata.artworkData!!.size)
+//                if (coverBitmap != null) {
+//                    bitmapSource = "metadata.artworkData"
+//                    Log.i("CustomNotificationProvider", "Successfully decoded Bitmap from metadata.artworkData.")
+//                }
+//            } catch (e: Exception) {
+//                Log.e("CustomNotificationProvider", "Error decoding Bitmap from artworkData", e)
+//            }
+//        }
 //        if (albumArtBitmap != null) {
 //            smallContentView.setImageViewBitmap(R.id.notification_album_art, albumArtBitmap)
 //        } else {

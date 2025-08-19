@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.session)
 //    implementation(libs.androidx.media3.decoder.ffmpeg)
-
+    implementation(libs.glide) // 使用 Glide 的最新版本
 //    implementation(libs.tablayout)
 //    implementation(libs.viewpager2delegate)
 
