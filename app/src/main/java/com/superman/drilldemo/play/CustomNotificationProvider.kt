@@ -1,12 +1,11 @@
 
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.RemoteViews
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
@@ -101,6 +100,9 @@ class CustomNotificationProvider1(private val context: Context) : MediaNotificat
             .setOngoing(player.isPlaying) // 如果正在播放，通知不可清除
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 在锁屏上显示内容
             .setStyle(NotificationCompat.DecoratedCustomViewStyle()) // **重要：用于自定义视图**
+            .setColor(Color.RED)
+            .setColorized(true)
+//            .setStyle(androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle())
             .setCustomContentView(smallContentView)
 //            .setCustomBigContentView(bigContentView) // 设置展开视图
 

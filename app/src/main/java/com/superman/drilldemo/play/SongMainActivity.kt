@@ -59,7 +59,8 @@ class SongMainActivity : AppCompatActivity() {
                                 androidx.media3.common.MediaMetadata.Builder()
                                     .setTitle("SoundHelix Song 1")
                                     .setArtist("SoundHelix")
-                                    .setArtworkUri("https://upload-images.jianshu.io/upload_images/5809200-a99419bb94924e6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240".toUri())
+                                    .setArtworkUri("https://images2017.cnblogs.com/blog/1035009/201708/1035009-20170804105602772-686911367.png".toUri())
+//                                    .setArtworkUri("https://upload-images.jianshu.io/upload_images/5809200-a99419bb94924e6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240".toUri())
                                     // .setAlbumArtUri(...) // Podrías añadir URI de artwork aquí
                                     .build()
                             )
@@ -74,14 +75,22 @@ class SongMainActivity : AppCompatActivity() {
                                     .build()
                             )
                             .build()
-                        controller.setMediaItems(listOf(mediaItem1, mediaItem2))
+//                        controller.setMediaItems(listOf(mediaItem1, mediaItem2))
+//                        controller.setMediaItems(listOf(mediaItem1,mediaItem2,mediaItem1))
+                        controller.setMediaItem(mediaItem1)
                         controller.prepare()
+
+                        viewBinding.playPauseButton1.setOnClickListener {
+                            controller.setMediaItem(mediaItem2)
+                            controller.prepare()
+                            controller.play()
+                        }
                     }
                     controller.play()
                 }
             }
         }
-
+        viewBinding.playPauseButton2.setOnClickListener { startActivity(Intent(this, SongMainActivity::class.java)) }
         viewBinding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {

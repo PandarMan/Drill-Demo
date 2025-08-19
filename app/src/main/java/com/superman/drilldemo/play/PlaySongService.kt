@@ -118,7 +118,7 @@ class PlaySongService : MediaSessionService() {
                 })
             }
 
-
+            player.repeatMode = Player.REPEAT_MODE_ALL
         val sessionActivityPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
                 PendingIntent.getActivity(this, 0, sessionIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -131,7 +131,7 @@ class PlaySongService : MediaSessionService() {
             .setBitmapLoader(GlideBitmapLoader(this))
             .build()
 
-        setMediaNotificationProvider(CustomNotificationProvider1(this))
+//        setMediaNotificationProvider(CustomNotificationProvider1(this))
 
         Log.d(TAG, "Player and MediaSession initialized with CUSTOM notification provider")
     }
