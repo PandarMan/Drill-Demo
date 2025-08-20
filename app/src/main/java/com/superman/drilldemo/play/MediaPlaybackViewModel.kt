@@ -103,6 +103,7 @@ class MediaPlaybackViewModel(application: Application) : AndroidViewModel(applic
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
+                println("--->>>>onPlaybackStateChanged$playbackState,")
                 _playerState.value = playbackState
                 if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
                     _duration.value = controller.duration

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -14,6 +15,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
@@ -73,8 +76,8 @@ class SongMainActivity : AppCompatActivity() {
                             )
                             .build()
 //                        controller.setMediaItems(listOf(mediaItem1, mediaItem2))
-//                        controller.setMediaItems(listOf(mediaItem1,mediaItem2,mediaItem1))
-                        controller.setMediaItem(mediaItem1)
+                        controller.setMediaItems(listOf(mediaItem1,mediaItem2,mediaItem1))
+//                        controller.setMediaItem(mediaItem1)
                         controller.prepare()
 
                         viewBinding.playPauseButton1.setOnClickListener {
@@ -101,7 +104,45 @@ class SongMainActivity : AppCompatActivity() {
         val serviceIntent = Intent(this, PlaySongService::class.java)
         ContextCompat.startForegroundService(this, serviceIntent)
     }
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // 必须调用 setIntent(intent)，这样后续的 getIntent() 才会获取到新的 Intent
+        setIntent(intent)
 
+        // 处理新的 Intent，例如播放新歌
+        intent?.let { newIntent ->
+            playNewSong(sampleAudioUrl2, "songTitle" /*, artist */)
+        }
+    }
+    @OptIn(UnstableApi::class)
+    private fun playNewSong(songUrl: String, title: String /*, artist: String */) {
+        mediaController?.let { controller ->
+            val mediaItem = MediaItem.Builder()
+                .setUri(Uri.parse(songUrl))
+                .setMediaId(songUrl) // 使用 URL 作为 Media ID，或者生成一个唯一的 ID
+                .setMediaMetadata(
+                    androidx.media3.common.MediaMetadata.Builder()
+                        .setTitle(title)
+                        // .setArtist(artist)
+                        // 你也可以在这里添加 artwork URI 等
+                        .build()
+                )
+                .build()
+
+            controller.setMediaItem(mediaItem)
+            controller.prepare()
+            controller.play()
+
+            // 更新 UI 以反映新歌曲（尽管 Player.Listener 应该也会处理这个）
+            updateMediaMetadataUI(mediaItem.mediaMetadata)
+            updatePlayPauseButton(true) // 假设开始播放了
+        } ?: run {
+            Log.e("SongMainActivity", "MediaController is null, cannot play new song.")
+            // 可以考虑在这里缓存歌曲信息，等 MediaController 初始化后再播放
+            // 或者显示一个错误消息
+            Toast.makeText(this, "MediaController not available. Please try again.", Toast.LENGTH_SHORT).show()
+        }
+    }
     @androidx.annotation.OptIn(UnstableApi::class)
     override fun onStart() {
         super.onStart()
@@ -141,6 +182,8 @@ class SongMainActivity : AppCompatActivity() {
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
+                    println("--->>>>onPlaybackStateChanged11$playbackState,")
+
                     if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
                         updateSeekBar(controller.currentPosition, controller.duration)
                     }
@@ -225,5 +268,36 @@ class SongMainActivity : AppCompatActivity() {
         val seconds = totalSeconds % 60
         return String.format("%02d:%02d", minutes, seconds)
     }
+
+    // 在你的 Activity 或 ViewModel 中
+    @OptIn(UnstableApi::class)
+    fun applyEqualizerGainToService(gainInMillibels: Short) {
+        mediaController?.let { controller ->
+            val args = Bundle().apply {
+                putShort(PlaySongService.KEY_EQ_GAIN_MB, gainInMillibels)
+            }
+            val command = SessionCommand(PlaySongService.CUSTOM_COMMAND_SET_EQ_GAIN, Bundle.EMPTY)
+
+            Log.d("MyActivity", "Sending command to set EQ gain to $gainInMillibels mB")
+            val resultFuture = controller.sendCustomCommand(command, args)
+            resultFuture.addListener({
+                try {
+                    val result = resultFuture.get()
+                    if (result.resultCode == SessionResult.RESULT_SUCCESS) {
+                        Log.d("MyActivity", "EQ gain command successful.")
+                    } else {
+                        Log.w("MyActivity", "EQ gain command failed with code: ${result.resultCode}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("MyActivity", "Error sending EQ gain command", e)
+                }
+            }, MoreExecutors.directExecutor())
+        } ?: Log.e("MyActivity", "MediaController not available to send EQ gain command.")
+    }
+
+// 使用示例：
+// applyEqualizerGainToService(500) // 设置 5dB 增益
+// applyEqualizerGainToService(0)    // 恢复默认 (无增益)
+
 }
 

@@ -30,7 +30,8 @@
         <activity android:name=".MainActivity" />
         <activity android:name="com.superman.exoplayerdemo.FirstActivity" />
         <activity android:name=".activity.TestProgressBarActivity" />
-        <activity android:name=".play.SongMainActivity" />
+        <activity android:name=".play.SongMainActivity"
+            android:launchMode="singleTop"/>
 
         <service
             android:name="com.superman.exoplayerdemo.PlaybackService"
