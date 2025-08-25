@@ -7,6 +7,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- If using PlatformScheduler -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Needed by JobScheduler -->
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" /> <!-- 新增权限 -->
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -26,13 +34,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".play.SongMainActivity22" />
+        <activity android:name=".play.SongMainActivity22"
+            android:launchMode="singleTop"/>
         <activity android:name=".MainActivity" />
         <activity android:name="com.superman.exoplayerdemo.FirstActivity" />
         <activity android:name=".activity.TestProgressBarActivity" />
         <activity android:name=".play.SongMainActivity"
             android:launchMode="singleTop"/>
-
+        <activity android:name=".play.download.DownloadWithViewModelActivity"/>
         <service
             android:name="com.superman.exoplayerdemo.PlaybackService"
             android:exported="true"
@@ -50,7 +59,14 @@
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
-
+        <!-- 或其他合适的类型 -->
+        <!-- You might want to add an intent filter if you need to start it from other apps,
+             but for typical in-app downloads, exported="false" is fine. -->
+        <service
+            android:name=".play.download.MyDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
+        </service>
     </application>
 
 </manifest>

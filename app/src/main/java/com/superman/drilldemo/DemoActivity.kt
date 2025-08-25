@@ -3,10 +3,12 @@ package com.superman.drilldemo
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.util.UnstableApi
 import com.superman.drilldemo.activity.TestProgressBarActivity
 import com.superman.drilldemo.databinding.ActivityDemoBinding
 import com.superman.drilldemo.play.SongMainActivity
 import com.superman.drilldemo.play.SongMainActivity22
+import com.superman.drilldemo.play.download.DownloadWithViewModelActivity
 
 /**
  *
@@ -16,6 +18,8 @@ import com.superman.drilldemo.play.SongMainActivity22
  */
 class DemoActivity:AppCompatActivity() {
     private val vb by lazy { ActivityDemoBinding.inflate(layoutInflater) }
+
+    @UnstableApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vb.root)
@@ -26,7 +30,13 @@ class DemoActivity:AppCompatActivity() {
             startActivity(Intent(this, SongMainActivity::class.java))
         }
         vb.btnSongAct2.setOnClickListener {
-            startActivity(Intent(this, SongMainActivity22::class.java))
+//            startActivity(Intent(this, SongMainActivity22::class.java))
+//            overridePendingTransition( R.anim.fade_in,  // 新 Activity 进入的动画 (enterAnimResId)
+//                R.anim.fade_out)
+            SongMainActivity22.start(this)
+        }
+        vb.btnDownload.setOnClickListener {
+            DownloadWithViewModelActivity.start(this)
         }
     }
 }

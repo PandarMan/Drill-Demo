@@ -61,9 +61,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 // 或者你正在使用的版本
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-// (或者您使用的 Media3 版本)
-// 通常与 core 一起使用
-// 或者查看最新的稳定版本
+
+    implementation("androidx.media3:media3-database:1.8.0")
+// Or the same version as exoplayer
 //    implementation(libs.tablayout)
 //    implementation(libs.viewpager2delegate)
 

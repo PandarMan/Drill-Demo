@@ -2,6 +2,8 @@ package com.superman.drilldemo.play // Asegúrate de que el nombre del paquete s
 
 import MediaPlaybackViewModel
 import android.Manifest
+import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -11,6 +13,8 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -22,6 +26,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import com.superman.drilldemo.R
 import com.superman.drilldemo.databinding.SongActivityMainBinding
 import com.superman.drilldemo.play.PlaySongService
 import kotlinx.coroutines.flow.collectLatest
@@ -40,6 +45,21 @@ class SongMainActivity22 : AppCompatActivity() {
     private val sampleAudioUrl2 = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
 
     companion object {
+        fun start(context: Context) {
+            // 在你的当前 Activity (例如, FirstActivity)
+            val intent = Intent(context, SongMainActivity22::class.java)
+
+// 创建 ActivityOptions
+            val options = ActivityOptions.makeCustomAnimation(
+                context, // context
+                R.anim.fade_in,  // 新 Activity 进入的动画 (enterAnimResId)
+                R.anim.fade_out  // 旧 Activity 退出的动画 (exitAnimResId)
+            )
+
+// 启动 Activity 并传入 options 的 Bundle
+            context.startActivity(intent, options.toBundle())
+        }
+
         private const val TAG = "SongMainActivity22" // 日志 TAG
         const val ACTION_PLAY_SONG = "com.superman.drilldemo.play.ACTION_PLAY_SONG"
         const val EXTRA_SONG_URI = "com.superman.drilldemo.play.EXTRA_SONG_URI"
@@ -74,6 +94,33 @@ class SongMainActivity22 : AppCompatActivity() {
         // 注意：如果权限请求是异步的，handleIntent 可能会在服务连接之前执行。
         // playRequestedSong 内部的 .first() 会等待连接。
         handleIntent(intent, isNewLaunch = true)
+//        val onBackPressedCallback = object : OnBackPressedCallback(true /* enabled by default */) {
+//            override fun handleOnBackPressed() {
+//                // 当返回按钮被按下时，调用 supportFinishAfterTransition()
+//                // 来执行返回的过渡动画。
+//                Log.d(TAG, "Back pressed, calling supportFinishAfterTransition()")
+//                supportFinishAfterTransition()
+//
+//                // 通常，调用 supportFinishAfterTransition() 后，你不需要再做其他操作来关闭 Activity，
+//                // 因为这个方法会处理 Activity 的结束过程并播放动画。
+//                // 如果你想在调用 supportFinishAfterTransition() 之后禁用此回调，
+//                // 以防在动画播放期间再次触发（虽然通常不是问题），可以这样做：
+//                // isEnabled = false
+//            }
+//        }
+//        onBackPressedDispatcher.addCallback(onBackPressedCallback)
+//        onBackPressedDispatcher.addCallback(this) {
+//            supportFinishAfterTransition()
+//
+//        }
+
+        viewBinding.finish.setOnClickListener {
+//            supportFinishAfterTransition()
+            finish()
+            overridePendingTransition(R.anim.stay_still, R.anim.slide_out_to_bottom)
+
+
+        }
     }
 
     private fun startPlaySongService() {
@@ -84,7 +131,11 @@ class SongMainActivity22 : AppCompatActivity() {
         } catch (e: IllegalStateException) {
             // 这可能在Android 12+后台启动限制时发生，如果权限不在或应用不在豁免列表
             Log.e(TAG, "Failed to start PlaySongService in foreground", e)
-            Toast.makeText(this, "Could not start playback service. Please check app permissions.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Could not start playback service. Please check app permissions.",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -98,6 +149,7 @@ class SongMainActivity22 : AppCompatActivity() {
                     Log.d(TAG, "Notification permission already granted.")
                     startPlaySongService()
                 }
+
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     Log.i(TAG, "Showing rationale for notification permission.")
                     // 显示一个解释性对话框
@@ -109,10 +161,15 @@ class SongMainActivity22 : AppCompatActivity() {
                         }
                         .setNegativeButton("Deny") { dialog, _ ->
                             dialog.dismiss()
-                            Toast.makeText(this, "Playback notifications will not be available.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "Playback notifications will not be available.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                         .show()
                 }
+
                 else -> {
                     Log.d(TAG, "Requesting notification permission.")
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -178,7 +235,10 @@ class SongMainActivity22 : AppCompatActivity() {
             songId = "defaultSong1"
         } else {
             // onNewIntent 收到一个不符合 ACTION_PLAY_SONG 的 Intent
-            Log.d(TAG, "Received non-play Intent in onNewIntent, doing nothing specific with playback.")
+            Log.d(
+                TAG,
+                "Received non-play Intent in onNewIntent, doing nothing specific with playback."
+            )
             return
         }
 
@@ -196,27 +256,47 @@ class SongMainActivity22 : AppCompatActivity() {
             try {
                 mediaViewModel.isConnected.filter { connected ->
                     val controllerAvailable = mediaViewModel.mediaController != null
-                    Log.d(TAG, "playRequestedSong: Connection status: $connected, Controller available: $controllerAvailable")
+                    Log.d(
+                        TAG,
+                        "playRequestedSong: Connection status: $connected, Controller available: $controllerAvailable"
+                    )
                     connected && controllerAvailable
                 }.first() // 等待连接成功且 MediaController 可用
             } catch (e: Exception) {
                 Log.e(TAG, "playRequestedSong: Exception while waiting for connection", e)
-                Toast.makeText(this@SongMainActivity22, "Error connecting to playback service.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@SongMainActivity22,
+                    "Error connecting to playback service.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@launch
             }
 
-            Log.d(TAG, "playRequestedSong: ViewModel connected. MediaController should be available.")
+            Log.d(
+                TAG,
+                "playRequestedSong: ViewModel connected. MediaController should be available."
+            )
             val currentMediaController = mediaViewModel.mediaController
             if (currentMediaController == null) {
-                Log.e(TAG, "playRequestedSong: MediaController is null even after isConnected. Cannot play.")
-                Toast.makeText(this@SongMainActivity22, "Playback controller not available.", Toast.LENGTH_SHORT).show()
+                Log.e(
+                    TAG,
+                    "playRequestedSong: MediaController is null even after isConnected. Cannot play."
+                )
+                Toast.makeText(
+                    this@SongMainActivity22,
+                    "Playback controller not available.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@launch
             }
 
             val currentPlayingMediaItem = currentMediaController.currentMediaItem
             val isPlayingThisSong = currentPlayingMediaItem?.mediaId == mediaId
 
-            Log.d(TAG, "playRequestedSong: Current Media ID: ${currentPlayingMediaItem?.mediaId}, Requested Media ID: $mediaId, IsPlayingThisSong: $isPlayingThisSong")
+            Log.d(
+                TAG,
+                "playRequestedSong: Current Media ID: ${currentPlayingMediaItem?.mediaId}, Requested Media ID: $mediaId, IsPlayingThisSong: $isPlayingThisSong"
+            )
 
             if (isPlayingThisSong) {
                 Log.d(TAG, "Song $mediaId ($title) is already the current item.")
@@ -370,6 +450,8 @@ class SongMainActivity22 : AppCompatActivity() {
         val seconds = totalSeconds % 60
         return String.format("%02d:%02d", minutes, seconds)
     }
+
+
 }
 
 
