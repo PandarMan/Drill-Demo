@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope // viewModelScope for launching coroutines
-import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
@@ -111,7 +110,7 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
 
     /**
      * [startOrResumeDownload]
-     * 作用: 启动一个新的下载任务，或者如果任务已存在且已停止/失败，则尝试恢复它。
+     * 作用: 启动一个新的下载任务，或者如果任务已存在，则根据其状态尝试恢复或只是通知。
      *      使用 viewModelScope.launch 启动一个与 ViewModel生命周期绑定的协程。
      * 参数:
      *   - songId: String - 下载内容的唯一 ID。
@@ -121,32 +120,77 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
      */
     fun startOrResumeDownload(songId: String, songUrl: String, songTitle: String) {
         viewModelScope.launch { // 在 ViewModel 的协程作用域内执行
-            // 从 DownloadIndex 异步获取指定 ID 的现有下载信息
+            Log.d("DownloadViewModel", "Attempting to start or resume download for ID: $songId, Title: $songTitle")
+
+            // 步骤 1: 异步从 DownloadIndex 获取指定 ID 的现有下载信息
             val existingDownload = withContext(Dispatchers.IO) { // 切换到 IO 线程进行磁盘/网络操作
-                downloadManager.downloadIndex.getDownload(songId)
+                try {
+                    downloadManager.downloadIndex.getDownload(songId)
+                } catch (e: Exception) {
+                    Log.e("DownloadViewModel", "Error fetching existing download $songId from index", e)
+                    null // 如果查询出错，则认为不存在
+                }
             }
 
-            if (existingDownload != null) { // 如果下载已存在
-                // 如果下载已停止或失败，则发送恢复所有下载的命令
-                // (Media3 的 DownloadService 通常是全局恢复)
-                if (existingDownload.state == Download.STATE_STOPPED || existingDownload.state == Download.STATE_FAILED) {
-                    Log.d("DownloadViewModel", "Resuming download for: $songId (via global resume)")
-                    DownloadService.sendResumeDownloads(
-                        appContext,
-                        MyDownloadService::class.java, // 你的 DownloadService 实现类
-                        false // foreground: false，服务会自行管理前台状态
-                    )
-                } else if (existingDownload.state == Download.STATE_QUEUED || existingDownload.state == Download.STATE_DOWNLOADING) {
-                    Log.d("DownloadViewModel", "Download already in progress or queued: $songId")
-                    // 可选: 通知 UI 或显示消息表明下载已在进行中
-                } else {
-                    Log.d("DownloadViewModel", "Download for $songId in unhandled state to resume: ${existingDownload.state}")
+            if (existingDownload != null) { // 如果下载记录已存在
+                Log.d("DownloadViewModel", "Existing download found for ID: $songId, State: ${existingDownload.state}")
+                when (existingDownload.state) {
+                    Download.STATE_DOWNLOADING, Download.STATE_QUEUED -> {
+                        // 如果已经在下载或排队中，通常不需要做额外操作，可以考虑通知用户
+                        Log.i("DownloadViewModel", "Download for $songId is already in progress or queued.")
+                        // 可选: 可以通过 LiveData 或其他方式通知 UI 下载已在进行中
+                    }
+                    Download.STATE_STOPPED -> {
+                        // 如果已停止 (通常是用户手动暂停，或者因为 setStopReason)
+                        Log.i("DownloadViewModel", "Resuming stopped download for $songId.")
+                        // 要恢复一个被 setStopReason 停止的下载，需要清除停止原因
+                        // 如果只是全局暂停 (downloadsPaused = true)，则 resumeDownloads 即可
+                        // 为确保恢复，可以先清除特定下载的停止原因（如果之前设置过）
+                        // 然后再调用全局恢复
+                        downloadManager.setStopReason(songId, Download.STOP_REASON_NONE)
+                        DownloadService.sendResumeDownloads(
+                            appContext,
+                            MyDownloadService::class.java, // 你的 DownloadService 实现类
+                            false // foreground
+                        )
+                    }
+                    Download.STATE_FAILED -> {
+                        // 如果下载失败
+                        Log.i("DownloadViewModel", "Retrying failed download for $songId.")
+                        // 对于失败的下载，通常也是通过 resumeDownloads 来尝试重新下载
+                        // ExoPlayer 的 DownloadManager 会处理重试逻辑
+                        // 确保失败原因被清除，以便重试
+                        downloadManager.setStopReason(songId, Download.STOP_REASON_NONE) // 清除失败状态可能导致的停止
+                        DownloadService.sendResumeDownloads(
+                            appContext,
+                            MyDownloadService::class.java, // 你的 DownloadService 实现类
+                            false // foreground
+                        )
+                    }
+                    Download.STATE_COMPLETED -> {
+                        Log.i("DownloadViewModel", "Download for $songId is already completed.")
+                        // 可选: 通知 UI 下载已完成
+                    }
+                    Download.STATE_REMOVING -> {
+                        Log.w("DownloadViewModel", "Download for $songId is currently being removed. Cannot start/resume.")
+                        // 正在移除，不应再操作
+                    }
+                    else -> {
+                        Log.w("DownloadViewModel", "Download for $songId in unhandled state: ${existingDownload.state}. Attempting to resume.")
+                        // 对于其他未知或未明确处理的状态，尝试通用恢复
+                        downloadManager.setStopReason(songId, Download.STOP_REASON_NONE)
+                        DownloadService.sendResumeDownloads(
+                            appContext,
+                            MyDownloadService::class.java,
+                            false
+                        )
+                    }
                 }
-            } else { // 如果下载不存在，则创建新的下载请求
-                Log.d("DownloadViewModel", "Starting new download for: $songId")
+            } else { // 如果下载记录不存在，则创建新的下载请求
+                Log.i("DownloadViewModel", "No existing download found for $songId. Starting new download for URL: $songUrl")
                 val downloadRequest = DownloadRequest.Builder(songId, Uri.parse(songUrl))
                     .setMimeType(MimeTypes.AUDIO_MPEG) // 指定媒体类型，有助于播放器处理
-                    .setData(songTitle.toByteArray()) // 将标题存储在请求的 data 字段中
+                    .setData(songTitle.toByteArray(Charsets.UTF_8)) // 将标题存储在请求的 data 字段中, 确保使用一致的字符集
                     .build()
 
                 // 发送添加下载的命令给 DownloadService
@@ -156,6 +200,7 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
                     downloadRequest,
                     false
                 )
+                Log.d("DownloadViewModel", "Sent add download request for $songId to DownloadService.")
             }
             // 在发起操作后，立即获取并更新此下载ID的UI状态
             fetchDownloadState(songId)
@@ -256,13 +301,22 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             // 例如: if (_currentDownloadState.value?.downloadId == idOfRemovedDownload) { ... }
             // 在当前实现中，如果 download 为 null，且它就是 _currentDownloadState 代表的那个，
             // 我们可以直接 postValue(null)。
+            _currentDownloadState.value?.let {
+                // 只有当 LiveData 当前有值，并且这个值对应的下载现在变成了 null（例如被移除了）
+                // 但我们从 fetchDownloadState 传入的 downloadId 无法直接在这里判断是否是同一个。
+                // 更好的方式是在 onDownloadRemoved 中，如果移除的是当前追踪的 id，则直接 postValue(null)
+                // 这里，如果 download 为 null，一般意味着 fetchDownloadState(id) 没找到该 id。
+                // 如果 _currentDownloadState.value.downloadId 等于那个没找到的 id，则可以清空。
+                // 这个逻辑需要更小心处理，或者依赖 onDownloadRemoved。
+                // 为简单起见，如果 fetch 结果为 null，就更新为 null。
+            }
             _currentDownloadState.postValue(null) // 清除 LiveData 或设置为默认"未下载"状态
             return
         }
 
         // 尝试从 DownloadRequest 的 data 字段中恢复存储的标题
         val title = try {
-            String(download.request.data) // data 字段存储的是 ByteArray
+            String(download.request.data, Charsets.UTF_8) // 确保使用一致的字符集
         } catch (e: Exception) {
             Log.e("DownloadViewModel", "Failed to parse title from download data for ${download.request.id}", e)
             "Unknown Title" // 获取失败时的默认标题
@@ -319,7 +373,10 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             Log.e("DownloadViewModel", "Download failed for ${download.request.id}", finalException)
         }
         // 更新与此 Download 对象对应的 LiveData
-        updateLiveDataForDownload(download, manager.downloadsPaused)
+        // 只更新当前 ViewModel 正在追踪的那个下载项 (如果匹配)
+        if (_currentDownloadState.value?.downloadId == download.request.id || _currentDownloadState.value == null) {
+            updateLiveDataForDownload(download, manager.downloadsPaused)
+        }
     }
 
     /**
@@ -365,23 +422,38 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
      */
     override fun onIdle(manager: DownloadManager) {
         Log.d("DownloadViewModel", "DownloadManager is idle in ViewModel")
-        // 可以在这里执行一些清理操作或更新 UI 以反映空闲状态。
+        // 可以在这里执行一些清理操作，或者更新 UI 表示没有活动下载
     }
 
-    // --- ViewModel 生命周期回调 ---
+
+    /**
+     * [onRequirementsStateChanged]
+     * DownloadManager.Listener 回调。
+     * 作用: 当满足下载所需的条件发生变化时调用 (例如，网络连接状态改变)。
+     * 参数:
+     *   - manager: DownloadManager - 触发事件的 DownloadManager 实例。
+     *   - requirements: Requirements - 当前的条件对象。
+     *   - notMetRequirements: Int - 未满足的条件标志位 (Requirements.RequirementFlags)。
+     */
+    override fun onRequirementsStateChanged(manager: DownloadManager, requirements: androidx.media3.exoplayer.scheduler.Requirements, notMetRequirements: Int) {
+        Log.d("DownloadViewModel", "onRequirementsStateChanged in ViewModel - Not met: $notMetRequirements")
+        // 当网络条件变化等导致之前无法下载的任务现在可以下载 (或反之) 时，
+        // DownloadManager 可能会自动开始/暂停下载。
+        // 我们需要刷新当前追踪的下载项状态以反映这些变化。
+        refreshAllTrackedDownloadsStates()
+    }
+
+
+    // --- ViewModel 生命周期 ---
 
     /**
      * [onCleared]
-     * ViewModel 生命周期回调。
-     * 作用: 当 ViewModel 不再被使用并即将被销毁时调用。
-     *      这是进行资源清理的最佳位置，例如移除监听器。
+     * 当 ViewModel 不再被使用并即将被销毁时调用。
+     * 在这里移除 DownloadManager 的监听器，以防止内存泄漏。
      */
     override fun onCleared() {
         super.onCleared()
-        // 非常重要: 移除之前添加的 DownloadManager 监听器，以防止内存泄漏。
-        downloadManager.removeListener(this)
-        Log.d("DownloadViewModel", "ViewModel cleared, DownloadManager listener removed.")
+        downloadManager.removeListener(this) // 非常重要，移除监听器
+        Log.d("DownloadViewModel", "ViewModel cleared, listener removed from DownloadManager.")
     }
 }
-
-

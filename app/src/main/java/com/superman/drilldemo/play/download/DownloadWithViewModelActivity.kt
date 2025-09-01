@@ -30,8 +30,8 @@ class DownloadWithViewModelActivity : AppCompatActivity() {
     private lateinit var songTitleTextView: TextView
 
     // Example song details (can be passed to ViewModel or fetched by it)
-    private val currentSongId = "sample_song_vm_002"
-    private val currentSongUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    private val currentSongId = "sample_song_vm_003"
+    private val currentSongUrl = "https://musicpress.site/musicpress/acoustic%20blues.mp3"
     private val currentSongTitle = "SoundHelix ViewModel Song"
 
     private val requestPermissionLauncher =

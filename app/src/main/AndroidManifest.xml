@@ -34,14 +34,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".play.SongMainActivity22"
-            android:launchMode="singleTop"/>
+        <activity
+            android:name=".play.SongMainActivity22"
+            android:launchMode="singleTop" />
         <activity android:name=".MainActivity" />
         <activity android:name="com.superman.exoplayerdemo.FirstActivity" />
         <activity android:name=".activity.TestProgressBarActivity" />
-        <activity android:name=".play.SongMainActivity"
-            android:launchMode="singleTop"/>
-        <activity android:name=".play.download.DownloadWithViewModelActivity"/>
+        <activity
+            android:name=".play.SongMainActivity"
+            android:launchMode="singleTop" />
+        <activity android:name=".play.download.DownloadWithViewModelActivity" />
+        <activity android:name=".play.download.list1.SongListActivity" />
+
         <service
             android:name="com.superman.exoplayerdemo.PlaybackService"
             android:exported="true"
@@ -65,8 +69,22 @@
         <service
             android:name=".play.download.MyDownloadService"
             android:exported="false"
-            android:foregroundServiceType="dataSync">
+            android:foregroundServiceType="dataSync"></service>
+
+        <service
+            android:name=".play.download.list1.MyDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".play.download.list1.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
         </service>
+
+
     </application>
 
 </manifest>

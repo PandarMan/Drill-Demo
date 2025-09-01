@@ -8,4 +8,12 @@
     <string name="previous">Previous</string>
 
     <string name="download_notification_channel_name">手上实打实</string>
+
+
+    <string name="download_channel_name">应用媒体下载</string>
+    <string name="download_channel_description">显示媒体文件下载进度的通知</string>
+    <string name="default_download_title">正在下载媒体</string>
+    <string name="downloading_notification_title">正在下载: %1$s</string>
+    <string name="download_notification_no_active_downloads">当前无活动下载</string>
+
 </resources>

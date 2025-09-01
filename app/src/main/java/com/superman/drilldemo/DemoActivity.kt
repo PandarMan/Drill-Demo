@@ -9,6 +9,7 @@ import com.superman.drilldemo.databinding.ActivityDemoBinding
 import com.superman.drilldemo.play.SongMainActivity
 import com.superman.drilldemo.play.SongMainActivity22
 import com.superman.drilldemo.play.download.DownloadWithViewModelActivity
+import com.superman.drilldemo.play.download.list1.SongListActivity
 
 /**
  *
@@ -16,7 +17,7 @@ import com.superman.drilldemo.play.download.DownloadWithViewModelActivity
  * @date : 2025/8/16
  * @description:
  */
-class DemoActivity:AppCompatActivity() {
+class DemoActivity : AppCompatActivity() {
     private val vb by lazy { ActivityDemoBinding.inflate(layoutInflater) }
 
     @UnstableApi
@@ -37,6 +38,9 @@ class DemoActivity:AppCompatActivity() {
         }
         vb.btnDownload.setOnClickListener {
             DownloadWithViewModelActivity.start(this)
+        }
+        vb.btnDownload22.setOnClickListener {
+            SongListActivity.start(this)
         }
     }
 }
