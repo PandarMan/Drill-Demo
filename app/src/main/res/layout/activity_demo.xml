@@ -43,5 +43,11 @@
             android:layout_height="wrap_content"
             android:text="测试下载22222" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="coordinatorlayout"
+            android:id="@+id/coordinatorLayout"/>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.core.widget.NestedScrollView>

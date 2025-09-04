@@ -64,6 +64,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     implementation("androidx.media3:media3-database:1.8.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+// 用于 SwipeRefreshLayout
 // Or the same version as exoplayer
 //    implementation(libs.tablayout)
 //    implementation(libs.viewpager2delegate)

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.util.UnstableApi
+import com.superman.coordinatorLayout.CoordinatorLayoutActivity
 import com.superman.drilldemo.activity.TestProgressBarActivity
 import com.superman.drilldemo.databinding.ActivityDemoBinding
 import com.superman.drilldemo.play.SongMainActivity
@@ -41,6 +42,9 @@ class DemoActivity : AppCompatActivity() {
         }
         vb.btnDownload22.setOnClickListener {
             SongListActivity.start(this)
+        }
+        vb.coordinatorLayout.setOnClickListener {
+            CoordinatorLayoutActivity.start(this)
         }
     }
 }
