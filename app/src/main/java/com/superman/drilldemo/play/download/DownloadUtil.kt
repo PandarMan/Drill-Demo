@@ -15,6 +15,41 @@ import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import java.io.File
 import java.util.concurrent.Executors
 
+/**
+ *                         ┌───────────────────────┐
+ *                         │    DownloadManager    │
+ *                         │──────────────────────│
+ *                         │ - 管理下载任务        │
+ *                         │ - 使用线程池并发下载 │
+ *                         └─────────┬────────────┘
+ *                                   │ depends on
+ *                                   ▼
+ *                         ┌───────────────────────┐
+ *                         │      SimpleCache      │
+ *                         │──────────────────────│
+ *                         │ - 缓存已下载文件      │
+ *                         │ - 提供 CacheDataSource │
+ *                         │ - 使用 DatabaseProvider│
+ *                         └─────────┬────────────┘
+ *                                   │ used by
+ *                                   ▼
+ *                         ┌───────────────────────────────┐
+ *                         │     CacheDataSource.Factory    │
+ *                         │──────────────────────────────│
+ *                         │ - 提供给 ExoPlayer 播放器     │
+ *                         │ - 从缓存读取或上游下载数据   │
+ *                         │ - 上游数据源: HttpDataSource │
+ *                         └─────────┬────────────────────┘
+ *                                   │
+ *                                   ▼
+ *                        ┌─────────────────────────────┐
+ *                        │  DefaultHttpDataSource.Factory│
+ *                        │─────────────────────────────│
+ *                        │ - 从网络下载数据             │
+ *                        │ - 支持 User-Agent 设置       │
+ *                        └─────────────────────────────┘
+ *
+ */
 @UnstableApi
 object DownloadUtil {
 
@@ -68,7 +103,7 @@ object DownloadUtil {
             // 尝试使用外部私有目录
             // 你可以选择一个类型，如 Environment.DIRECTORY_DOWNLOADS, Environment.DIRECTORY_MUSIC,
             // 或者传 null 将其放在 /Android/data/<package>/files/ 目录下
-            val externalFilesDirType = Environment.DIRECTORY_DOWNLOADS
+            val externalFilesDirType = Environment.DIRECTORY_DOWNLOADS  //下载目录
             val baseExternalDir = appContext.getExternalFilesDir(externalFilesDirType)
             val cacheDir: File
 

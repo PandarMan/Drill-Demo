@@ -101,10 +101,19 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             if (existingDownload != null) {
                 // ... (与之前相同的恢复逻辑: STATE_DOWNLOADING, STATE_STOPPED, STATE_FAILED etc.)
                 // 例如:
-                if (existingDownload.state == Download.STATE_STOPPED || existingDownload.state == Download.STATE_FAILED) {
+                if (existingDownload.state == Download.STATE_STOPPED) {
                     downloadManager.setStopReason(songId, Download.STOP_REASON_NONE)
                     DownloadService.sendResumeDownloads(appContext, MyDownloadService::class.java, false)
-                } else if (existingDownload.state == Download.STATE_QUEUED || existingDownload.state == Download.STATE_DOWNLOADING) {
+                } else if (existingDownload.state == Download.STATE_FAILED) {
+                    //先移除
+                    DownloadService.sendRemoveDownload(appContext, MyDownloadService::class.java, songId, false)
+                    val downloadRequest = DownloadRequest.Builder(songId, Uri.parse(songUrl))
+                        .setMimeType(MimeTypes.AUDIO_MPEG)
+                        .setData(songTitle.toByteArray(Charsets.UTF_8))
+                        .build()
+                    DownloadService.sendAddDownload(appContext, MyDownloadService::class.java, downloadRequest, false)
+                }
+                else if (existingDownload.state == Download.STATE_QUEUED || existingDownload.state == Download.STATE_DOWNLOADING) {
                     Log.i("DownloadViewModel", "Download $songId already in progress or queued.")
                 } else if (existingDownload.state == Download.STATE_COMPLETED) {
                     Log.i("DownloadViewModel", "Download $songId already completed.")
@@ -122,10 +131,10 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
 
     fun pauseDownload(songId: String) {
         // 对于单个暂停，你可以设置 stop reason
-        // downloadManager.setStopReason(songId, YOUR_PAUSE_REASON_IF_ANY)
+         downloadManager.setStopReason(songId, 1)//YOUR_PAUSE_REASON_IF_ANY
         // 或者全局暂停
-        Log.d("DownloadViewModel", "Pausing all downloads (action triggered for song: $songId)")
-        DownloadService.sendPauseDownloads(appContext, MyDownloadService::class.java, false)
+//        Log.d("DownloadViewModel", "Pausing all downloads (action triggered for song: $songId)")
+//        DownloadService.sendPauseDownloads(appContext, MyDownloadService::class.java, false)
     }
 
     fun removeDownload(songId: String) {
@@ -149,6 +158,7 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
     override fun onDownloadRemoved(manager: DownloadManager, download: Download) {
         Log.d("DownloadViewModel", "Listener onDownloadRemoved - ID: ${download.request.id}")
         val liveData = downloadStatesMap[download.request.id]
+        downloadStatesMap.remove(download.request.id)
         liveData?.postValue(null) // 或者一个表示“未下载”的特定 DownloadUiState
         // 可选: 从 map 中移除 LiveData，如果确定不再需要 (但要小心，如果 ViewHolder 仍可能观察)
         // downloadStatesMap.remove(download.request.id)
@@ -201,13 +211,18 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             String(download.request.data, Charsets.UTF_8)
         } catch (e: Exception) { "Unknown Title" }
 
+        val isPaused = downloadsGloballyPaused && (download.state == Download.STATE_QUEUED || download.state == Download.STATE_DOWNLOADING || download.state == Download.STATE_STOPPED)
+//        val isPaused = (download.stopReason != Download.STOP_REASON_NONE) ||
+//                (downloadsGloballyPaused && (download.state == Download.STATE_QUEUED
+//                        || download.state == Download.STATE_DOWNLOADING
+//                        || download.state == Download.STATE_STOPPED))
         val uiState = DownloadUiState(
             downloadId = download.request.id,
             title = title,
             status = download.state,
             percentDownloaded = download.percentDownloaded,
             failureReason = download.failureReason,
-            isPaused = downloadsGloballyPaused && (download.state == Download.STATE_QUEUED || download.state == Download.STATE_DOWNLOADING || download.state == Download.STATE_STOPPED)
+            isPaused = isPaused
         )
         liveData.postValue(uiState)
     }

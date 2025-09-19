@@ -87,7 +87,7 @@ class SongsAdapter(
             binding.downloadButton.visibility = View.VISIBLE
             binding.pauseButton.visibility = View.GONE
             binding.removeButton.visibility = View.GONE
-
+            println("-----state: ${uiState.status} ,progress: ${uiState.percentDownloaded}")
             when (uiState.status) {
                 Download.STATE_DOWNLOADING -> {
                     binding.statusTextView.text = "下载中: ${uiState.percentDownloaded.toInt()}%"
@@ -103,6 +103,7 @@ class SongsAdapter(
                     binding.downloadButton.text = "播放" // Indicates it's ready
                     binding.downloadButton.isEnabled = true
                     binding.removeButton.visibility = View.VISIBLE
+                    binding.removeButton.isEnabled = true
                 }
                 Download.STATE_QUEUED -> {
                     binding.statusTextView.text = "排队中"
@@ -117,6 +118,7 @@ class SongsAdapter(
                     binding.downloadButton.text = "继续"
                     binding.downloadButton.isEnabled = true
                     binding.removeButton.visibility = View.VISIBLE
+                    binding.removeButton.isEnabled =true
                 }
                 Download.STATE_FAILED -> {
                     binding.statusTextView.text = "下载失败" // Reason: ${uiState.failureReason}

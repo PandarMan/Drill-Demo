@@ -121,7 +121,7 @@ class SongsAdapter
         private fun updateDownloadUi(uiState: DownloadUiState, song: Song) {
             // song.currentDownloadUiState = uiState // 如果还需要在 Song 对象中暂存
             binding.songProgressBar.isIndeterminate = false
-
+            println("------>>>> state: $uiState.status")
             when (uiState.status) {
                 Download.STATE_DOWNLOADING -> {
                     binding.statusTextView.text = "下载中: ${uiState.percentDownloaded.toInt()}%"
@@ -136,6 +136,7 @@ class SongsAdapter
                     binding.downloadButton.text = "播放"
                     binding.pauseButton.visibility = View.GONE
                     binding.removeButton.visibility = View.VISIBLE
+                    binding.removeButton.isEnabled = true
                 }
                 // ... (其他状态的 UI 更新逻辑，与之前方案类似) ...
                 Download.STATE_QUEUED -> {

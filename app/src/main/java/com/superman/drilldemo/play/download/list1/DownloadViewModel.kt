@@ -1,6 +1,5 @@
 package com.superman.drilldemo.play.download.list1
 
-
 import android.app.Application
 import android.app.Notification
 import android.net.Uri
@@ -19,6 +18,9 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import com.superman.drilldemo.R // 确保 R 文件路径正确
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
@@ -90,6 +92,7 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+
     fun startOrResumeDownload(songId: String, songUrl: String, songTitle: String) {
         viewModelScope.launch { // 通常在主线程发起，但内部IO操作会切换
             Log.d("DownloadViewModel", "Attempting to start or resume download for ID: $songId, URL: $songUrl")
@@ -126,20 +129,22 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             } else {
                 // 没有现有下载，创建新的下载请求
                 val downloadRequest = DownloadRequest.Builder(songId, Uri.parse(songUrl))
-                    .setMimeType(MimeTypes.AUDIO_MPEG) // 根据你的媒体类型调整
+//                    .setMimeType(MimeTypes.AUDIO_MPEG) // 根据你的媒体类型调整
+                    .setMimeType(MimeTypes.VIDEO_WEBM)
                     .setData(songTitle.toByteArray(Charsets.UTF_8)) // 将标题作为数据存储，用于通知等
                     .build()
-                DownloadService.sendAddDownload(appContext, MyDownloadService::class.java, downloadRequest, false)
+                DownloadService.sendAddDownload(appContext, MyDownloadService::class.java, downloadRequest, true)
                 Log.i("DownloadViewModel", "Adding new download request for $songId: $songTitle")
-            }
             // 状态更新将通过 DownloadManager.Listener 的回调来驱动 LiveData
         }
     }
 
+}
     fun pauseDownload(songId: String) {
+        downloadManager.setStopReason(songId, 1)//YOUR_PAUSE_REASON_IF_ANY
         // ExoPlayer 的 DownloadManager 通常是全局暂停所有下载
         Log.d("DownloadViewModel", "Pausing all downloads (action triggered for song: $songId)")
-        DownloadService.sendPauseDownloads(appContext, MyDownloadService::class.java, false)
+//        DownloadService.sendPauseDownloads(appContext, MyDownloadService::class.java, false)
     }
 
     fun removeDownload(songId: String) {
@@ -169,7 +174,7 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
                 notificationHelper.buildDownloadCompletedNotification(
                     appContext,
                     R.drawable.ic_launcher_foreground, // 你需要这个 drawable
-                    null, // contentIntent (可选)
+                    null, // contentIntent (可选) //点击通知动作
                     Util.fromUtf8Bytes(download.request.data) // 从 request.data 获取标题
                 )
             }
@@ -283,6 +288,49 @@ class DownloadViewModel(application: Application) : AndroidViewModel(application
             isPaused = downloadsGloballyPaused && (download.state == Download.STATE_DOWNLOADING || download.state == Download.STATE_QUEUED || download.state == Download.STATE_STOPPED)
         )
         liveData.postValue(uiState)
+
+        // ---------------- 定时刷新逻辑 ----------------
+        when (download.state) {
+            Download.STATE_DOWNLOADING -> startProgressUpdater(download.request.id, liveData)
+            Download.STATE_COMPLETED,
+            Download.STATE_FAILED,
+            Download.STATE_STOPPED -> stopProgressUpdater(download.request.id)
+            else -> {}
+        }
+    }
+    // 每个下载的定时刷新 Job
+    private val progressJobs = ConcurrentHashMap<String, Job>()
+    private fun startProgressUpdater(songId: String, liveData: MutableLiveData<DownloadUiState?>) {
+        if (progressJobs.containsKey(songId)) return
+        val job = viewModelScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                try {
+                    val download = downloadManager.downloadIndex.getDownload(songId)
+                    if (download != null && download.state == Download.STATE_DOWNLOADING) {
+                        val uiState = DownloadUiState(
+                            downloadId = download.request.id,
+                            title = if (download.request.data.isNotEmpty()) Util.fromUtf8Bytes(download.request.data) else "未知标题",
+                            status = download.state,
+                            percentDownloaded = download.percentDownloaded,
+                            failureReason = download.failureReason,
+                            isPaused = downloadManager.downloadsPaused
+                        )
+                        withContext(Dispatchers.Main) {
+                            liveData.value = uiState
+                        }
+                    }
+                } catch (_: Exception) {}
+                delay(500)
+            }
+        }
+        progressJobs[songId] = job
+    }
+
+    private fun stopProgressUpdater(songId: String) {
+//        progressJobs[songId]?.cancel()
+//        progressJobs.remove(songId)
+        val job = progressJobs.remove(songId) ?: return  // 如果不存在直接返回
+        job.cancel()
     }
 
     override fun onCleared() {

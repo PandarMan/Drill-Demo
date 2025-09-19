@@ -54,13 +54,14 @@ object DownloadUtil {
         if (downloadCacheInstance == null) {
             val appContext = context.applicationContext
             val baseExternalDir = appContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+
             val cacheDir: File
 
             if (baseExternalDir != null && (baseExternalDir.exists() || baseExternalDir.mkdirs())) {
                 cacheDir = File(baseExternalDir, EXTERNAL_DOWNLOAD_CACHE_SUBDIR)
                 Log.d(TAG, "Using external private directory for DOWNLOAD cache: ${cacheDir.absolutePath}")
             } else {
-                Log.w(TAG, "External storage not available or creatable for DOWNLOAD cache. Falling back to internal.")
+                Log.w(TAG, "外部存储不可用或无法创建下载缓存。回退至内部存储。")
                 val internalCacheBaseDir = appContext.cacheDir
                 cacheDir = File(internalCacheBaseDir, INTERNAL_DOWNLOAD_FALLBACK_SUBDIR)
                 Log.d(TAG, "Using internal fallback directory for DOWNLOAD cache: ${cacheDir.absolutePath}")
@@ -87,7 +88,7 @@ object DownloadUtil {
     private fun getHttpDataSourceFactoryForDownloads(appContext: Context): DefaultHttpDataSource.Factory {
         if (httpDataSourceFactoryForDownloads == null) {
             Log.d(TAG, "Initializing HttpDataSource.Factory for downloads.")
-            httpDataSourceFactoryForDownloads = DefaultHttpDataSource.Factory().setUserAgent(USER_AGENT_DOWNLOADS)
+            httpDataSourceFactoryForDownloads = DefaultHttpDataSource.Factory()//.setUserAgent(USER_AGENT_DOWNLOADS)
         }
         return httpDataSourceFactoryForDownloads!!
     }

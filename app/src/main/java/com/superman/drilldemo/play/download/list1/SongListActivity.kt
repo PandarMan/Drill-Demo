@@ -62,7 +62,7 @@ class SongListActivity : AppCompatActivity() {
         Song(
             "song_003",
             "Big Buck Bunny (MP4 Video)",
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "https://rr5---sn-p5qddn7k.googlevideo.com/videoplayback?expire=1758273569&ei=wMvMaJyTOLmD0_wPgcH86As&ip=67.43.56.56&id=o-AFwtZ13DxMmpFckZyefGBaLIfvIdYNfAIo2juj9E214F&itag=137&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=73&met=1758251968%2C&mh=eI&mm=31%2C26&mn=sn-p5qddn7k%2Csn-qja5mc-5h&ms=au%2Conr&mv=u&mvi=5&pl=27&rms=au%2Cau&gcr=us&bui=ATw7iSUsMilqWnOtoFNaasCIFKwmoEHOaULetQTXreCxrMPauswjlPwIh5MiOs62bsUSbuPySw13gaX6&spc=hcYD5TAGBUY-EldsN7_i&vprv=1&svpuc=1&mime=video%2Fmp4&rqh=1&gir=yes&clen=1145235&dur=231.800&lmt=1695914725276548&mt=1758250318&fvip=4&keepalive=yes&fexp=51552689%2C51565116%2C51565681%2C51580968&c=ANDROID&txp=4532434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cgcr%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJfQdSswRQIhAKx0ojKR3__6EvR_z7tVZ3klr8PYStrHG7-cJNkORa13AiB-Nz20bl2uAmvDjQfwfx-IYvoUqrUc7UxtQhUUfSFPIA%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms&lsig=APaTxxMwRgIhAKF1L3tQusU8tQNc-fZ9TL5hA36QYaq6lRATIiDUfy38AiEAgcORt3_BNfJynqVqQMUzmJzzOus57kd7Ev8buOrgLHg%3D",
             "Blender Foundation"
         ),
         Song(

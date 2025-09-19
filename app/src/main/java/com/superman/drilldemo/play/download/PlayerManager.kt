@@ -150,4 +150,5 @@ object PlayerManager { // 或者可以是一个非 object 类，根据你的架�
         streamingCacheDataSourceFactory = null
         Log.d(TAG, "Streaming cache components released.")
     }
+
 }
